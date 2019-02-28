@@ -18,4 +18,4 @@ $ node crawler.js
 Note - The links.txt file is cleared before every run.
 
 
-[medium.com/robots.txt]: <https://medium.com/robots.txt>
+[robots.txt]: <https://medium.com/robots.txt>
