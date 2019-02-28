@@ -1,4 +1,4 @@
-# Simple Web Crawler
+# Simple Medium Crawler
 
 Crawls medium.com and records all the crawled links in a text file (links.txt).
 
@@ -11,7 +11,7 @@ Crawls medium.com and records all the crawled links in a text file (links.txt).
 Install the dependencies and run the script.
 
 ```sh
-$ cd simple-web-crawler
+$ cd simple-medium-crawler
 $ npm i
 $ node crawler.js
 ```
