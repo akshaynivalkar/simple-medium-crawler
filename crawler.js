@@ -1,4 +1,4 @@
-var request = require('request');
+const https = require('https');
 var cheerio = require('cheerio');
 var URL = require('url-parse');
 var fs = require('fs');
@@ -77,7 +77,7 @@ function crawl() {
     }, 25000);
 }
 
-function visitPage(url, crawl, thread) {
+function visitPage(url, crawl, request) {
     numPagesVisited++;
     pagesVisited[url] = true;
     fs.appendFile('links.txt', url + '\n', function (err) {
@@ -85,9 +85,15 @@ function visitPage(url, crawl, thread) {
     });
 
     // console.log("[" + numPagesVisited + "/" + totalpages + "] Visiting page " + url);
-    console.log("visitpage " + thread + " " + url);
-    request(url, function (error, response, body) {
-        if (!error) {
+    console.log("visitpage " + request + " " + url);
+    https.get(url, (response) => {
+        let data = '';
+
+        response.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        response.on('end', () => {
             console.log("Status code: " + response.statusCode);
             if (response.statusCode !== 200) {
                 crawl();
@@ -95,18 +101,20 @@ function visitPage(url, crawl, thread) {
             }
             if (response.statusCode == 429) {
                 setTimeout(() => {
-                    var $ = cheerio.load(body);
+                    var $ = cheerio.load(data);
                     collectInternalLinks($);
                     crawl();
                 }, 5000);
             }
             else {
-                // Parse the document body
-                var $ = cheerio.load(body);
+                // Parse the document data
+                var $ = cheerio.load(data);
                 collectInternalLinks($);
                 crawl();
             }
-        }
+        });
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
     });
 }
 
@@ -137,7 +145,8 @@ function collectInternalLinks($) {
                 console.log("skipping restricted link");
             }
             else {
-                pagesToVisit.push($(this).attr('href'));
+                let httpsurl = $(this).attr('href');
+                pagesToVisit.push(httpsurl.replace('http://', 'https://'));
                 totalpages++;
             }
         }
