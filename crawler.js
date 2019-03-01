@@ -79,6 +79,7 @@ function crawl() {
 
 function visitPage(url, crawl, thread) {
     numPagesVisited++;
+    pagesVisited[url] = true;
     fs.appendFile('links.txt', url + '\n', function (err) {
         if (err) throw err;
     });
@@ -113,8 +114,7 @@ function collectInternalLinks($) {
     var relativeLinks = $("a[href^='/']");
     relativeLinks.each(function () {
         if ((baseUrl + $(this).attr('href')) in pagesVisited) {
-            // console.log("already visited: " + baseUrl + $(this).attr('href'));
-            return
+            // console.log("already visited: " + baseUrl + $(this).attr('href'));            
         }
         else {
             if ($(this).attr('href').includes('/m/') || $(this).attr('href').includes('/me/') || $(this).attr('href').match(/(@)\w+/g)) {
@@ -130,8 +130,7 @@ function collectInternalLinks($) {
     var absoluteLinks = $("a[href^='http']");
     absoluteLinks.each(function () {
         if ($(this).attr('href') in pagesVisited) {
-            // console.log("already visited: " + $(this).attr('href'));
-            return
+            // console.log("already visited: " + $(this).attr('href'));            
         }
         else if ($(this).attr('href').includes(url.hostname)) {
             if ($(this).attr('href').includes('/m/') || $(this).attr('href').includes('/me/') || $(this).attr('href').match(/(@)\w+/g)) {
